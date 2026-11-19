@@ -4,6 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#15102e">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="未知の生命体">
 <title>未知の生命体</title>
 <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="src/style.css">
@@ -18,8 +23,10 @@
     <input class="nm" id="nm" maxlength="10" aria-label="なまえ" placeholder="なまえをつけてあげる">
     <p class="ttl" id="ttl"></p>
     <p class="sub" id="info"></p>
+    <p class="sub pers" id="pers"></p>
     <p class="say" id="say" aria-live="polite"></p>
     <p class="sub amb" id="amb"></p>
+    <p style="margin:8px 0 0"><button id="rb" style="display:none">あたらしい子を迎える</button></p>
     <p style="margin:6px 0 0"><button class="ch sm" id="lk" style="flex:none"></button></p>
   </div>
 
@@ -27,14 +34,18 @@
 
   <div class="card">
     <div>おなか<div class="bar"><i id="hb"></i></div></div>
+    <p class="sub hn" id="hn" style="margin:6px 0 0"></p>
     <div class="row foods" id="foods" style="margin-top:14px"></div>
-    <p class="sub">あげるもので、性質がちょっとかたむくよ。でも、それだけで姿は決まらない!</p>
+    <p class="sub">あげるもので、性質がちょっとかたむくよ。でも、それだけで姿は決まらない!餌は2日に1回あげないと、この子は星になってしまう。</p>
   </div>
+
+  <div class="card" id="pk"></div>
+  <div class="card" id="qs"></div>
 
   <h3>きざし</h3>
   <ul class="log" id="log"></ul>
   <p class="sub" id="lnote"></p>
-  <p style="text-align:center;margin:18px 0 6px"><button class="ch sm" id="sv" style="flex:none"></button></p>
+  <p class="acts"><button class="ch sm" id="sv" style="flex:none"></button><button class="ch sm" id="sh" style="flex:none">友達に送る</button><button class="ch sm" id="ex" style="flex:none">画像で保存</button></p>
 
   <h3>ずかん</h3>
   <p class="sub" id="dexn" style="margin:0 0 8px"></p>
@@ -47,7 +58,7 @@
   <p class="sub">近くにいる子どうしは、ほんのり光って共鳴するよ。タップすると自分の子と見比べられる。</p>
   <div class="card" id="cmp" style="display:none;margin-top:12px"></div>
 
-  <h3>みんなの子</h3>
+  <h3>注目の子</h3>
   <ol class="rank" id="rank"></ol>
   <p class="sub" id="rnote"></p>
 
@@ -61,6 +72,7 @@
 
   <p style="text-align:center;margin-top:36px"><button class="ch sm" id="rs" style="flex:none">今週の子をやり直す</button></p>
 </main>
+<div id="toast" role="status" aria-live="polite"></div>
 <script src="src/shim.js"></script>
 <script src="src/data.js"></script>
 <script src="src/art.js"></script>

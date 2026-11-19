@@ -113,15 +113,15 @@ window.BODYF=function(g){
 // ---- 模様(体の内側に重ねる) ----
 window.PATTERN=function(g,H){
   if(!g.pat||g.s<=0)return "";
-  var cx=H.cx,cy=H.cy,R=H.R,r=rngS(g.pseed),h=g.h2,W=H.W,a=(W?.34:.5)*Math.min(1,g.s+.1),o="",i,col="hsl("+h+" 80% "+(W?82:66)+"%)",col2="hsl("+((h+40)%360)+" 85% 86%)";
+  var dn=H.den==null?.5:H.den,cx=H.cx,cy=H.cy,R=H.R,r=rngS(g.pseed),h=g.h2,W=H.W,a=(W?.34:.5)*Math.min(1,g.s+.1),o="",i,col="hsl("+h+" 80% "+(W?82:66)+"%)",N1,col2="hsl("+((h+40)%360)+" 85% 86%)";
   switch(g.pat){
-   case 1:for(i=0;i<8+Math.floor(r()*6);i++){var x=cx+(r()-.5)*R*1.5,y=cy+(r()-.5)*R*1.5;o+='<circle cx="'+f1(x)+'" cy="'+f1(y)+'" r="'+f1(1.8+r()*R*.12)+'" fill="'+col+'" opacity="'+f1(a)+'"/>';}break;
+   case 1:for(i=0,N1=Math.round((8+Math.floor(r()*6))*(.5+dn));i<N1;i++){var x=cx+(r()-.5)*R*1.5,y=cy+(r()-.5)*R*1.5;o+='<circle cx="'+f1(x)+'" cy="'+f1(y)+'" r="'+f1(1.8+r()*R*.12)+'" fill="'+col+'" opacity="'+f1(a)+'"/>';}break;
    case 2:for(i=-5;i<=5;i++)o+='<path d="M'+f1(cx+i*R*.3-R)+" "+f1(cy+R)+"l"+f1(R*1.4)+" "+f1(-R*2)+'" stroke="'+col+'" stroke-width="'+f1(2+r()*3)+'" opacity="'+f1(a*.8)+'"/>';break;
-   case 3:{var ox=cx+(r()-.5)*R*.8,oy=cy+(r()-.5)*R*.8;for(i=1;i<=6;i++)o+='<circle cx="'+f1(ox)+'" cy="'+f1(oy)+'" r="'+f1(i*R*.22)+'" fill="none" stroke="'+col+'" stroke-width="1.4" opacity="'+f1(a*(1-i*.1))+'"/>';break;}
-   case 4:for(i=0;i<34;i++)o+='<circle cx="'+f1(cx+(r()-.5)*R*2)+'" cy="'+f1(cy+(r()-.5)*R*2)+'" r="'+f1(.6+r()*1.1)+'" fill="'+col+'" opacity="'+f1(a+.15)+'"/>';break;
+   case 3:{var ox=cx+(r()-.5)*R*.8,oy=cy+(r()-.5)*R*.8;for(i=1;i<=3+Math.round(dn*5);i++)o+='<circle cx="'+f1(ox)+'" cy="'+f1(oy)+'" r="'+f1(i*R*.22)+'" fill="none" stroke="'+col+'" stroke-width="1.4" opacity="'+f1(a*(1-i*.1))+'"/>';break;}
+   case 4:for(i=0,N1=Math.round(34*(.4+1.2*dn));i<N1;i++)o+='<circle cx="'+f1(cx+(r()-.5)*R*2)+'" cy="'+f1(cy+(r()-.5)*R*2)+'" r="'+f1(.6+r()*1.1)+'" fill="'+col+'" opacity="'+f1(a+.15)+'"/>';break;
    case 5:for(i=0;i<3;i++){var yy=cy+(i-1)*R*.5+(r()-.5)*8;o+='<path d="M'+f1(cx-R)+" "+f1(yy)+"q"+f1(R*.5)+" "+f1(-9-r()*8)+" "+f1(R)+" 0t"+f1(R)+' 0" stroke="'+col+'" stroke-width="'+f1(3+r()*4)+'" fill="none" opacity="'+f1(a*.8)+'"/>';}break;
    case 6:for(var yy2=-4;yy2<=4;yy2++)for(var xx=-4;xx<=4;xx++){var px=cx+xx*9+(yy2%2)*4.5,py=cy+yy2*8;o+='<path d="M'+f1(px-4)+" "+f1(py)+"q4 5.4 8 0"+'" stroke="'+col+'" stroke-width=".9" fill="none" opacity="'+f1(a)+'"/>';}break;
-   case 7:for(i=0;i<5;i++){var an=r()*2*PI;o+='<path d="M'+cx+" "+cy+"Q"+f1(cx+Math.cos(an+.6)*R*.5)+" "+f1(cy+Math.sin(an+.6)*R*.5)+" "+f1(cx+Math.cos(an)*R)+" "+f1(cy+Math.sin(an)*R)+'" stroke="'+col+'" stroke-width="1.3" fill="none" opacity="'+f1(a)+'"/>';}break;
+   case 7:for(i=0;i<3+Math.round(dn*5);i++){var an=r()*2*PI;o+='<path d="M'+cx+" "+cy+"Q"+f1(cx+Math.cos(an+.6)*R*.5)+" "+f1(cy+Math.sin(an+.6)*R*.5)+" "+f1(cx+Math.cos(an)*R)+" "+f1(cy+Math.sin(an)*R)+'" stroke="'+col+'" stroke-width="1.3" fill="none" opacity="'+f1(a)+'"/>';}break;
    case 8:{var gx=cx+(r()-.5)*R,gy=cy+(r()-.5)*R;o+='<circle cx="'+f1(gx)+'" cy="'+f1(gy)+'" r="'+f1(R*.8)+'" fill="url(#'+H.id+'p)"/>';break;}
    case 9:{var pts=[];for(i=0;i<7;i++)pts.push([cx+(r()-.5)*R*1.5,cy+(r()-.5)*R*1.5]);var d="M"+pts.map(function(p){return f1(p[0])+" "+f1(p[1]);}).join("L");o+='<path d="'+d+'" stroke="'+col2+'" stroke-width=".8" fill="none" opacity="'+f1(a+.1)+'"/>';pts.forEach(function(p){o+='<circle cx="'+f1(p[0])+'" cy="'+f1(p[1])+'" r="'+f1(1.2+r()*1.5)+'" fill="#fff" opacity=".8"/>';});break;}
   }
