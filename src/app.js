@@ -1,7 +1,8 @@
 (function(){
 var INSTANT=false; // テスト用: 答え・食事の変化をその場で反映(本番では false)
 var RV=6; // 値を上げると、一度だけ今週の個体が白い球体に戻る
-var LOOK="w";try{LOOK=localStorage.getItem("maru-look")||"w";}catch(e){}
+var LOOK="w";
+var USE3D=false,want3d=true;try{want3d=localStorage.getItem("maru-3d")!=="0";}catch(e){}
 var RM=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches;
 var KEY="maru-v5",DECAY=100/2880,PI=Math.PI,VIS=.12;
 var DN=["月","火","水","木","金","土","日"];
@@ -255,7 +256,7 @@ function petSVG(c,cls){
   var sp="",rk=rngS(sd+5);for(var i=0;i<7;i++){var a=rk()*2*PI,dd=rk()*R*.7;sp+=dt(a,dd,.8+rk()*1.6,"#fff",.22+rk()*.2);}
   s+=sp+'<circle class="'+(cls?"heart":"")+'" style="transform-origin:'+cx+'px '+(cy-1)+'px" cx="'+cx+'" cy="'+(cy-1)+'" r="'+(R*.5)+'" fill="url(#'+id+'c)" opacity="'+Math.min(1,(W?.16:.8)*(.55+.9*GV.glo)).toFixed(2)+'"/>'+inner+elFront+face+HL;
   s+='</g></g>';
-  window.__pi={dom:dom,G:G,mirN:mirN,shN:shN,n:vis(c).length};
+  window.__pi={dom:dom,G:G,mirN:mirN,shN:shN,n:vis(c).length,R:R,h:h,tot:tot,amp:amp,gx:gx_,gy:gy_,fv:fv};
   return '<svg class="pet'+(c.dead?" dead":"")+'" style="--fa:'+(.45+1.5*GV.flt).toFixed(2)+'" viewBox="0 0 200 200" role="img" aria-label="未知の生命体">'+s+'</svg>';
 }
 
@@ -266,7 +267,7 @@ var sayT=null;
 function say(m){var e=$("say");clearInterval(sayT);if(RM||m.length<3){e.textContent=m;return;}var i=0;e.textContent="";sayT=setInterval(function(){i++;e.textContent=m.slice(0,i);if(i>=m.length)clearInterval(sayT);},26);}
 function identOf(c){var pi=window.__pi;return IDENT(c,pi.dom,pi.G,pi.n,pi.mirN,pi.shN);}
 function starStr(n){var o="";for(var i=0;i<5;i++)o+=i<n?"★":"☆";return o;}
-function petCenter(){var sv=$("pet").firstChild,bx=$("petbox");if(!sv)return [100,100,40];var b=bx.getBoundingClientRect(),r=sv.getBoundingClientRect(),sc=r.width/200;return [r.left-b.left+r.width/2,r.top-b.top+r.height*.54,(33+Math.min(st.xp,500)/500*20)*sc];}
+function petCenter(){var sv=$("pet").firstChild,bx=$("petbox");if(!sv)return [100,100,40];var b=bx.getBoundingClientRect(),r=sv.getBoundingClientRect(),sc=r.width/200;return [r.left-b.left+r.width/2,r.top-b.top+r.height*.54,(33+Math.min(st.xp,500)/500*20)*sc*(USE3D?1.3:1)];}
 function elHue(){return st.el?MD.EHUE[st.el]:(window.__pi?TH[window.__pi.dom]:330);}
 function inBox(id){return st.box.some(function(b){return b.id===id;});}
 function topNames(c,k){return vis(c).sort(function(a,b){return c.parts[b]-c.parts[a];}).slice(0,k).map(function(i){return PARTS[i][0];});}
@@ -285,6 +286,7 @@ function playEvo(){
 var cool=false,qsig="";
 function renderPet(){
   $("pet").innerHTML=petSVG(st,"float");
+  if(USE3D)M3.update(st,window.__pi);
   var idn=identOf(st);FX.setEl(st.dead?"x":st.el);
   $("ttl").innerHTML=stageOf(st)===0?'<span class="tn">まだ名もない球体</span>':'<span class="tn">'+idn.name+'</span><span class="ts" title="めずらしさ">'+starStr(idn.stars)+'</span><span class="tc">No.'+idn.code+'</span>';
   $("info").textContent=(dayIdx()+1)+"日目 / 7 ・ "+STG[stageOf(st)]+" ・ 器官 "+vis(st).length+" ・ 性質 "+((st.act||[]).length)+"/3"+(st.el?" ・ "+EN[st.el]+"属性":"");
@@ -341,9 +343,9 @@ $("foods").addEventListener("click",function(e){
   cool=true;setTimeout(function(){cool=false;renderPet();},3000);
   save();renderPet();
 });
-function pokeSvg(){var sv=$("pet").firstChild;if(!sv)return false;sv.classList.remove("poke");void sv.getBoundingClientRect();sv.classList.add("poke");
+function pokeSvg(){var sv=$("pet").firstChild;if(!sv)return false;if(USE3D)M3.poke();sv.classList.remove("poke");void sv.getBoundingClientRect();sv.classList.add("poke");
   sv.addEventListener("animationend",function f(e){if(e.animationName==="poke"){sv.classList.remove("poke");sv.removeEventListener("animationend",f);}});return true;}
-function absorbSvg(col){var sv=$("pet").firstChild;if(!sv)return;sv.style.setProperty("--gc",col);sv.classList.remove("absorb");void sv.getBoundingClientRect();sv.classList.add("absorb");
+function absorbSvg(col){var sv=$("pet").firstChild;if(!sv)return;if(USE3D)M3.absorb(col);sv.style.setProperty("--gc",col);sv.classList.remove("absorb");void sv.getBoundingClientRect();sv.classList.add("absorb");
   sv.addEventListener("animationend",function f(e){if(e.animationName==="absorb"){sv.classList.remove("absorb");sv.removeEventListener("animationend",f);}});}
 function eat(f,gain){var fh=+f.col.match(/hsl\((\d+)/)[1];fx(f.k);FX.vib(12);
   setTimeout(function(){absorbSvg(f.col);var c=petCenter();FX.shock(fh,2);FX.burst(c[0],c[1],fh,22,3);FX.flash(fh);FX.pop($("petbox"),"+"+gain,"hsl("+fh+" 100% 80%)");$("hb").classList.add("glow");setTimeout(function(){$("hb").classList.remove("glow");},900);},RM?0:f.at);}
@@ -401,9 +403,9 @@ var AMB=["ゆっくり息してる。","表面がふわっと波うった。","�
 function pokeMsg(){var t=persOf(st).top;return t&&Math.random()<.6?MD.PPOKE[t][Math.floor(Math.random()*3)]:POKE[Math.floor(Math.random()*POKE.length)];}
 function amb(){var v=vis(st),a,pt0=persOf(st).top;if(st.dead)a="…。";else if(hunger()<30)a="動きがにぶくなってる…。";else if(pt0&&Math.random()<.35)a=MD.PAMB[pt0][Math.floor(Math.random()*3)];else if(!v.length||Math.random()<.4)a=AMB[Math.floor(Math.random()*AMB.length)];else a=PARTS[v[Math.floor(Math.random()*v.length)]][0]+"がちょっと動いた。";$("amb").textContent=a;}
 amb();setInterval(amb,11000);
-function lkTxt(){$("lk").textContent=LOOK==="w"?"見た目: 水(タップで切替)":"見た目: ふつう(タップで切替)";}
+function lkTxt(){$("lk").style.display=window.M3&&M3.ok()?"":"none";$("lk").textContent=USE3D?"表示: 3D(タップで2Dに)":"表示: 2D・軽い(タップで3Dに)";}
 lkTxt();
-$("lk").addEventListener("click",function(){LOOK=LOOK==="w"?"n":"w";try{localStorage.setItem("maru-look",LOOK);}catch(e){}lkTxt();renderPet();sig="";renderBoxes();drawRank(PL.slice());});
+$("lk").addEventListener("click",function(){if(!(window.M3&&M3.ok()))return;USE3D=!USE3D;try{localStorage.setItem("maru-3d",USE3D?"1":"0");}catch(e){}document.body.classList.toggle("has3d",USE3D);M3.show(USE3D);lkTxt();renderPet();});
 $("nm").addEventListener("input",function(e){st.name=e.target.value;save();});
 var rt=null;
 $("rs").addEventListener("click",function(){
@@ -600,6 +602,7 @@ setInterval(function(){
   else{renderQ();$("hb").style.width=hunger()+"%";renderHn();}
 },30000);
 window.__maru={petSVG:petSVG};
+if(window.M3&&M3.init($("petbox"))){USE3D=want3d;document.body.classList.toggle("has3d",USE3D);if(!USE3D)M3.show(false);}lkTxt();
 importHash();renderQs();renderPk();
 renderPet();renderQ(true);renderLog();renderBoxes();renderDex();FX.bg();
 FX.setupAmb($("petbox"),petCenter);

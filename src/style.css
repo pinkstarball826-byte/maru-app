@@ -275,3 +275,9 @@ svg.pet.dead *{animation-play-state:paused!important}
 .fil{animation:fil 8s ease-in-out infinite}
 @keyframes fil{0%,100%{opacity:.25}45%{opacity:.25}55%{opacity:1}65%{opacity:.4}}
 @media (prefers-reduced-motion:reduce){.swA,.swB,.fil{animation:none}}
+
+/* ===== 3D表示 ===== */
+#petbox{touch-action:pan-y}
+canvas.m3{position:absolute;left:-16px;top:-60px;width:calc(100% + 32px);height:calc(100% + 120px);pointer-events:none;z-index:2}
+.has3d #pet svg.pet{opacity:0}
+.has3d #pet{position:relative;z-index:3}
