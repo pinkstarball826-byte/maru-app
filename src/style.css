@@ -268,3 +268,10 @@ svg.pet.dead *{animation-play-state:paused!important}
 #rb{background:linear-gradient(180deg,#c7b8ff,#8f7aff);border-color:#8f7aff;color:#140a40}
 .pz svg circle[fill^="url("],.pz svg ellipse[fill^="url("]{pointer-events:none}
 .pz svg{pointer-events:none}.pz svg path[fill^="url("]{pointer-events:auto}
+
+.swA{animation:swA 70s linear infinite;transform-box:view-box}
+.swB{animation:swA 95s linear infinite reverse;transform-box:view-box}
+@keyframes swA{to{transform:rotate(360deg)}}
+.fil{animation:fil 8s ease-in-out infinite}
+@keyframes fil{0%,100%{opacity:.25}45%{opacity:.25}55%{opacity:1}65%{opacity:.4}}
+@media (prefers-reduced-motion:reduce){.swA,.swB,.fil{animation:none}}
