@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<title>未知の生命体</title>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="src/style.css">
+</head>
+<body>
+<div class="aurora" aria-hidden="true"><i></i><i></i><i></i></div>
+<canvas id="bg" aria-hidden="true"></canvas>
+<div id="flash" aria-hidden="true"></div>
+<main>
+  <div class="pet-wrap">
+    <div id="petbox" style="position:relative"><div id="pet"></div></div>
+    <input class="nm" id="nm" maxlength="10" aria-label="なまえ" placeholder="なまえをつけてあげる">
+    <p class="ttl" id="ttl"></p>
+    <p class="sub" id="info"></p>
+    <p class="say" id="say" aria-live="polite"></p>
+    <p class="sub amb" id="amb"></p>
+    <p style="margin:6px 0 0"><button class="ch sm" id="lk" style="flex:none"></button></p>
+  </div>
+
+  <div class="card" id="q"></div>
+
+  <div class="card">
+    <div>おなか<div class="bar"><i id="hb"></i></div></div>
+    <div class="row foods" id="foods" style="margin-top:14px"></div>
+    <p class="sub">あげるもので、性質がちょっとかたむくよ。でも、それだけで姿は決まらない!</p>
+  </div>
+
+  <h3>きざし</h3>
+  <ul class="log" id="log"></ul>
+  <p class="sub" id="lnote"></p>
+  <p style="text-align:center;margin:18px 0 6px"><button class="ch sm" id="sv" style="flex:none"></button></p>
+
+  <h3>ずかん</h3>
+  <p class="sub" id="dexn" style="margin:0 0 8px"></p>
+  <div class="dexe" id="dexe"></div>
+  <div class="dex" id="dex"></div>
+  <p class="sub">育てた子(今週・さいきん・とっておいた子)に生えた器官が、ここに記録されるよ。同じ器官でも、数・向き・色みは子ごとにちがう。</p>
+
+  <h3>今週の広場</h3>
+  <div class="plaza" id="plaza" role="group" aria-label="広場"></div>
+  <p class="sub">近くにいる子どうしは、ほんのり光って共鳴するよ。タップすると自分の子と見比べられる。</p>
+  <div class="card" id="cmp" style="display:none;margin-top:12px"></div>
+
+  <h3>みんなの子</h3>
+  <ol class="rank" id="rank"></ol>
+  <p class="sub" id="rnote"></p>
+
+  <h3>とっておいた子</h3>
+  <div class="box" id="box"></div>
+  <p class="sub" id="bnote"></p>
+
+  <h3>さいきんの子</h3>
+  <div class="box" id="hist"></div>
+  <p class="sub">月曜に新しい子が生まれて、1週間かけて姿が決まっていくよ。終わった子はここに残るから、気に入ったら「とっておく」で保存してね。</p>
+
+  <p style="text-align:center;margin-top:36px"><button class="ch sm" id="rs" style="flex:none">今週の子をやり直す</button></p>
+</main>
+<script src="src/shim.js"></script>
+<script src="src/data.js"></script>
+<script src="src/art.js"></script>
+<script src="src/fx.js"></script>
+<script src="src/app.js"></script>
+</body>
+</html>
