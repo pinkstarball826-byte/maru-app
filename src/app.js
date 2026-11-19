@@ -564,10 +564,13 @@ function importHash(){var m=/[#&]f=([^&]+)/.exec(location.hash||"");if(!m)return
   try{var f=cleanFriend(dec(m[1]));if(f){var j=-1;META.fr.forEach(function(x,i){if(x.id===f.id)j=i;});if(j>=0)META.fr[j]=f;else META.fr.push(f);META.fr=META.fr.slice(-12);saveMeta();setTimeout(function(){toast((f.name||"名もなき子")+"が広場にやってきた!");},1200);}}catch(e){}
   try{history.replaceState(null,"",location.pathname+location.search);}catch(e){}}
 $("sh").addEventListener("click",function(){
+  if(remote){toast("このページのリンクを友達に送ってね。開いた友達の子が、広場に並ぶよ");return;}
   var u=location.href.split("#")[0]+"#f="+enc(packSnap(st)),txt=(st.name||"名もなき子")+"を広場に送るよ。いっしょに見くらべよう!";
-  if(navigator.share){navigator.share({title:"未知の生命体",text:txt,url:u}).catch(function(){});return;}
-  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(txt+" "+u).then(function(){toast("リンクをコピーしたよ。友達に送ってね");},function(){window.prompt("このリンクを友達に送ってね",u);});}
-  else window.prompt("このリンクを友達に送ってね",u);});
+  var done=function(){toast("リンクをコピーしたよ。友達に送ってね");},fail=function(){showText("このリンクを友達に送ってね",u);};
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(txt+" "+u).then(done,function(){if(navigator.share)navigator.share({title:"未知の生命体",text:txt,url:u}).catch(fail);else fail();});}
+  else if(navigator.share)navigator.share({title:"未知の生命体",text:txt,url:u}).catch(fail);else fail();});
+function showOverlay(build){var ov=el("div","ovl");var inner=el("div","ovl-c");build(inner);var cl=el("button","ch sm","閉じる");cl.onclick=function(){ov.remove();};inner.appendChild(cl);ov.appendChild(inner);ov.onclick=function(e){if(e.target===ov)ov.remove();};document.body.appendChild(ov);}
+function showText(t,u){showOverlay(function(c){c.appendChild(el("p","",t));var ta=el("textarea","ovl-t");ta.value=u;ta.readOnly=true;c.appendChild(ta);setTimeout(function(){ta.focus();ta.select();},50);});}
 // 画像として保存
 $("ex").addEventListener("click",function(){
   var idn=(petSVG(st),identOf(st)),svg=petSVG(st).replace(/^<svg /,'<svg xmlns="http://www.w3.org/2000/svg" width="900" height="900" ');
@@ -582,9 +585,11 @@ $("ex").addEventListener("click",function(){
     g.fillStyle="#ffd166";g.font="700 38px 'Zen Maru Gothic',sans-serif";g.fillText(stageOf(st)?idn.name+"  "+starStr(idn.stars):"まだ名もない球体",540,1210);
     g.fillStyle="#b9b0ea";g.font="500 30px 'Zen Maru Gothic',sans-serif";g.fillText("No."+idn.code+"  ・  未知の生命体",540,1262);
     URL.revokeObjectURL(url);
-    cv.toBlob(function(b){if(!b)return;var f=new File([b],"maru-"+idn.code+".png",{type:"image/png"});
-      if(navigator.canShare&&navigator.canShare({files:[f]})){navigator.share({files:[f],title:"未知の生命体"}).catch(function(){});return;}
-      var a=document.createElement("a");a.href=URL.createObjectURL(b);a.download=f.name;document.body.appendChild(a);a.click();a.remove();toast("画像を保存したよ");},"image/png");};
+    var fname="maru-"+idn.code+".png",durl=cv.toDataURL("image/png");
+    cv.toBlob(function(b){if(!b)return;
+      showOverlay(function(c){c.appendChild(el("p","","長押し(右クリック)で画像を保存できるよ"));var im=el("img","ovl-i");im.src=durl;im.alt=(st.name||"名もなき子")+"の画像";c.appendChild(im);
+        if(dl){var sb=el("button","","ファイルとして保存");sb.onclick=function(){dl.save({filename:fname,data:b}).then(function(r){if(r&&r.status==="saved")toast("画像を保存したよ");}).catch(function(){});};c.appendChild(sb);}
+        else{var a=el("a","","ファイルとして保存");a.href=URL.createObjectURL(b);a.download=fname;a.className="dl";c.appendChild(a);}});},"image/png");};
   img.onerror=function(){toast("画像にできなかった…");};img.src=url;});
 if(window.IntersectionObserver){var pzT=null;new IntersectionObserver(function(en){if(en[0].isIntersecting){clearTimeout(pzT);pzT=setTimeout(function(){qprog("plaza");},1500);}else clearTimeout(pzT);},{threshold:.5}).observe($("plaza"));}
 
@@ -608,6 +613,9 @@ renderPet();renderQ(true);renderLog();renderBoxes();renderDex();FX.bg();
 FX.setupAmb($("petbox"),petCenter);
 if(st.evo)setTimeout(playEvo,INSTANT?200:900);
 refreshLocal();
+var dl=null;
+(async function(){try{dl=await claude.use("downloads");}catch(e){dl=null;}})();
+function cleanRemote(d,id){var f=cleanFriend({s:d.seed,t:d.tr,p:d.parts,g:d.gv,e:d.el,d:d.day,n:d.name,x:d.xp});if(!f)return null;f.id=id;f.fr=0;f.dead=d.dead?1:0;f.likes=Math.max(0,Math.floor(+d.likes||0));return f;}
 (async function(){
   try{
     var u=await claude.use("user"),d=await claude.use("db");
@@ -621,7 +629,7 @@ refreshLocal();
     var to=setTimeout(function(){remote=false;refreshLocal();$("rnote").textContent="読み込めなかった…。";},10000);
     db.collection("players").orderBy("xp","desc").limit(40).onSnapshot(function(s){
       clearTimeout(to);var w=weekKey();
-      var l=s.docs.map(function(d){var p=d.data();p.me=d.id===myId;p.id=d.id;return p;}).filter(function(p){return p.day===w&&p.parts&&p.seed;});
+      var l=s.docs.map(function(d){var p=cleanRemote(d.data()||{},d.id);if(p)p.me=d.id===myId;return p;}).filter(function(p){return p&&p.day===w;});
       if(!l.some(function(p){return p.me;}))l.push(me());
       drawRank(sortRank(l));
     },function(){clearTimeout(to);});
